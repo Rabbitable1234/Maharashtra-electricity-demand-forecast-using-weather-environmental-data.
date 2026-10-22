@@ -1,0 +1,146 @@
+Demand file: 3955 rows, 2013-01-01 to 2024-04-28
+Duplicate dates: 55 (of which 5 have conflicting values -> averaged)
+Missing days: 236 (by year: {2013: 94, 2014: 9, 2015: 13, 2016: 14, 2017: 29, 2018: 6, 2019: 3, 2020: 50, 2021: 13, 2022: 4, 2023: 1})
+Still missing after short-gap interpolation: 77 (long gaps are left empty, not invented)
+Outliers in demand index (|z|>4): 0 -> set to NaN
+
+Analysis window: 2014-01-01 to 2024-04-27 (3770 days)
+
+--- Descriptive statistics ---
+             count    mean    std     min     25%     50%     75%     max
+demand      3768.0  446.43  70.71  274.50  395.49  430.95  489.30  643.80
+demand_idx  3652.0   99.99   9.21   68.64   93.22   99.90  106.81  123.58
+t_mean      3770.0   26.65   3.56   17.67   24.28   26.33   28.58   35.93
+t_min       3770.0   22.01   3.89   10.58   18.84   23.26   24.55   30.03
+t_max       3770.0   32.14   3.97   21.10   29.27   31.08   34.71   42.48
+dewpoint    3770.0   17.65   4.51    3.24   13.95   17.49   22.35   24.29
+solar       3770.0    0.77   0.21    0.14    0.66    0.78    0.93    1.16
+cloud       3770.0    0.46   0.34    0.00    0.16    0.37    0.82    1.00
+wind_speed  3770.0    1.98   1.20    0.04    1.08    1.67    2.65    6.05
+
+Mean daily demand by year (MU/day):
+ year
+2014    379.0
+2015    390.4
+2016    393.9
+2017    423.1
+2018    446.8
+2019    430.0
+2020    414.4
+2021    474.2
+2022    516.3
+2023    548.8
+2024    593.8
+
+Demand index by season:
+                 mean   std
+season                    
+Monsoon        94.53  8.26
+Post-monsoon   99.44  7.98
+Summer        108.01  7.79
+Winter         99.56  6.34
+
+Peak demand day: 2024-03-28 = 643.8 MU, T_mean = 32.1 C
+First rows via iloc:
+             t_min  t_mean  t_max  dewpoint
+date                                      
+2014-01-01  16.62   21.45  28.01     13.73
+2014-01-02  16.34   21.67  28.23     13.53
+2014-01-03  16.28   21.98  29.00     13.15
+
+================ STATISTICAL ANALYSIS ================
+[Growth] demand rises 16.8 MU/day per year (r=0.91, p=2.9e-04); 379 -> 549 MU/day (45% rise)
+
+[Normality] Shapiro p=9.85e-07 | KS p=1.61e-02 -> NOT normal -> non-parametric tests used alongside
+
+[Correlation with demand index] Pearson r | Spearman rho | p
+  t_mean         r=+0.504  rho=+0.474  p=1.2e-233
+  t_min          r=+0.195  rho=+0.204  p=1.9e-32
+  t_max          r=+0.707  rho=+0.709  p=0.0e+00
+  t30            r=+0.321  rho=+0.283  p=4.8e-88
+  dewpoint       r=-0.363  rho=-0.404  p=2.8e-113
+  solar          r=+0.639  rho=+0.646  p=0.0e+00
+  cloud          r=-0.491  rho=-0.466  p=2.6e-219
+  wind_speed     r=-0.307  rho=-0.254  p=2.5e-80
+  diurnal_range  r=+0.558  rho=+0.509  p=4.1e-297
+
+[Levene] equal variance across seasons? p=2.72e-14
+[Independent t-test] weekday 100.7 vs weekend 98.3: t=7.1, p=1.7e-12
+[Mann-Whitney U]     weekday vs weekend: p=9.3e-12
+[One-way ANOVA] seasons: F=542.5, p=2.9e-291 | [Kruskal-Wallis] H=1123.5, p=2.9e-243
+[Paired t-test] monthly mean demand 2019-23 vs 2014-18: +70.2 MU/day, t=12.8, p=6.0e-08
+[Wilcoxon signed-rank] p=4.9e-04
+[Chi-square] season vs high-demand day: chi2=984.6, dof=3, p=3.9e-213
+demand_idx    False  True 
+season                    
+Monsoon        1103    117
+Post-monsoon    499    111
+Summer          337    583
+Winter          786     97
+
+[OLS regression on demand index] R2=0.579, adj R2=0.578
+=================================================================================
+                    coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------
+const            58.4794      1.678     34.852      0.000      55.190      61.769
+t_mean            1.6338      0.075     21.815      0.000       1.487       1.781
+t30              -0.1372      0.073     -1.876      0.061      -0.281       0.006
+diurnal_range     1.1147      0.096     11.591      0.000       0.926       1.303
+dewpoint         -0.2349      0.064     -3.670      0.000      -0.360      -0.109
+solar            -4.4509      1.083     -4.109      0.000      -6.575      -2.327
+cloud            -1.2788      0.641     -1.995      0.046      -2.536      -0.022
+wind_speed       -0.3749      0.114     -3.276      0.001      -0.599      -0.151
+is_weekend       -2.3162      0.220    -10.509      0.000      -2.748      -1.884
+=================================================================================
+VIF (multicollinearity; >10 = problem): {'t_mean': np.float64(7.2), 't30': np.float64(5.9), 'diurnal_range': np.float64(12.6), 'dewpoint': np.float64(8.5), 'solar': np.float64(5.1), 'cloud': np.float64(4.9), 'wind_speed': np.float64(1.9), 'is_weekend': np.float64(1.0)}
+R2 without temperature terms = 0.465 -> temperature adds 0.114
+
+================ TIME SERIES FORECASTING ================
+Dropping incomplete last month 2024-04-01
+Monthly series: 123 points, 2014-01-01 to 2024-03-01
+ADF [monthly demand]: stat=0.896, p=0.9930 -> NON-stationary
+ADF [after seasonal differencing (lag 12)]: stat=-2.087, p=0.2497 -> NON-stationary
+ADF [after seasonal + regular differencing]: stat=-4.877, p=0.0000 -> STATIONARY
+Chosen differencing: seasonal D=1 (lag 12), regular d=1
+/usr/local/lib/python3.12/dist-packages/statsmodels/tsa/statespace/mlemodel.py:679: EstimationWarning: Non-invertible starting MA parameters found. Using zeros as starting parameters.
+  start_params = self.start_params
+/usr/local/lib/python3.12/dist-packages/statsmodels/tsa/statespace/mlemodel.py:679: EstimationWarning: Non-invertible starting MA parameters found. Using zeros as starting parameters.
+  start_params = self.start_params
+/usr/local/lib/python3.12/dist-packages/statsmodels/tsa/statespace/mlemodel.py:679: EstimationWarning: Non-invertible starting MA parameters found. Using zeros as starting parameters.
+  start_params = self.start_params
+/usr/local/lib/python3.12/dist-packages/statsmodels/tsa/statespace/mlemodel.py:737: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
+  mlefit = super().fit(
+Best order by AIC: SARIMA(2, 1, 2)x(0,1,1,12), AIC=928.3
+/usr/local/lib/python3.12/dist-packages/statsmodels/tsa/statespace/mlemodel.py:679: EstimationWarning: Non-invertible starting MA parameters found. Using zeros as starting parameters.
+  start_params = self.start_params
+/usr/local/lib/python3.12/dist-packages/statsmodels/tsa/statespace/mlemodel.py:737: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
+  mlefit = super().fit(
+Hold-out last 12 months: MAE=25.7 MU  RMSE=31.0 MU  MAPE=4.5% | seasonal-naive MAE=48.9
+/usr/local/lib/python3.12/dist-packages/statsmodels/tsa/statespace/mlemodel.py:679: EstimationWarning: Non-invertible starting MA parameters found. Using zeros as starting parameters.
+  start_params = self.start_params
+Ljung-Box residual test (lag 12): p=0.953 -> residuals look like white noise (good fit)
+
+Next 12 months forecast (MU/day):
+2024-04-01    610.1
+2024-05-01    598.6
+2024-06-01    556.8
+2024-07-01    510.0
+2024-08-01    520.4
+2024-09-01    521.6
+2024-10-01    541.8
+2024-11-01    551.7
+2024-12-01    544.4
+2025-01-01    551.5
+2025-02-01    575.1
+2025-03-01    591.5
+Freq: MS
+
+================ CONCLUSION ================
+1. Demand grew 45% over 2014-2023 (+16.8 MU/day each year), so trend is removed before relating it to weather.
+2. After detrending, demand is highest in Summer (index 108.0) and lowest in Monsoon (94.5); seasonal differences are significant (ANOVA p=2.9e-291).
+3. Strongest single weather link: t_max (r=+0.71). Weather + calendar explain R2=0.58 of daily demand variation; temperature terms add 0.11.
+4. Weekdays draw about 2.4 index points more than weekends (likely economic-activity effect).
+5. SARIMA(2, 1, 2)x(0,1,1,12) hold-out MAE=25.7 MU/day (4.5% MAPE) vs seasonal-naive 48.9 -> beats the baseline.
+6. Limitations: state-average weather, no holiday/industrial data, 2020 COVID disruption, gaps in reporting.
+
+Charts saved in ./outputs/
